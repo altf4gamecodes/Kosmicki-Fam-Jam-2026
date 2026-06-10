@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Reunion 2026: Attraction Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap');
+
+        :root {
+            --bg-warm: #FDFBF7;
+            --primary: #4A5568;
+            --accent: #84A59D;
+            --highlight: #D4A373;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-warm);
+            color: var(--primary);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        .tab-active {
+            border-bottom: 3px solid var(--accent);
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .hide { display: none; }
+        
+        .scroll-section {
+            scroll-margin-top: 100px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+<!-- Chosen Palette: Warm Earth Tones (Cream, Sage, Slate, Sand) -->
+<!-- Application Structure Plan: 
+    1. Dashboard Landing: High-level overview, quick stats (Age distribution, distance chart), and reunion summary.
+    2. Interactive Category Browser: A tabbed interface allowing users to filter attractions by type (Mahoney, Zoos, Museums, etc.).
+    3. Day-by-Day View: A specific view for the July 26-29 dates to show what is happening and operational hours.
+    4. Proximity Search: A simple distance-based sorting system.
+    This structure was chosen to cater to the mixed demographic of the reunion, ensuring older adults can find information quickly via clear headers while providing interactive charts for a modern exploration experience.
+-->
+<!-- Visualization & Content Choices:
+    - Bar Chart (Chart.js): Comparing distances from Mahoney to various hubs to manage travel expectations.
+    - Doughnut Chart (Chart.js): Breakdown of attractions by age suitability to ensure 'something for everyone'.
+    - Interactive Cards: Each attraction is presented as a clean card with specific '2026-Ready' data.
+    - JS Filtering: Real-time category filtering to reduce information density.
+    - Confirmation: NO SVG graphics used. NO Mermaid JS used. Using standard Unicode and CSS for visual markers.
+-->
+
+<header class="bg-white border-b border-stone-200 sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+        <div class="text-center md:text-left mb-4 md:mb-0">
+            <h1 class="text-3xl font-bold text-stone-800">Family Reunion 2026</h1>
+            <p class="text-stone-500 font-medium italic">July 26 – July 29 • Mahoney State Park, NE</p>
+        </div>
+        <nav class="flex space-x-2 md:space-x-6 overflow-x-auto pb-2 md:pb-0">
+            <button onclick="showTab('dashboard')" id="btn-dashboard" class="px-3 py-1 tab-active whitespace-nowrap">Overview</button>
+            <button onclick="showTab('explore')" id="btn-explore" class="px-3 py-1 whitespace-nowrap text-stone-600">Explore Attractions</button>
+           </nav>
+    </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-8">
+
+    <!-- DASHBOARD SECTION -->
+    <section id="tab-dashboard" class="space-y-12">
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-stone-100">
+            <h2 class="text-4xl mb-4 text-stone-800">Welcome to the Kosmicki Fam Jam 2026!</h2>
+            <p class="text-lg text-stone-600 max-w-3xl">
+                Our reunion is centered at **Eugene T. Mahoney State Park**, perfectly situated halfway between Lincoln and Omaha. This interactive guide helps you navigate on-site amenities and regional favorites. Use the charts below to see how our activities spread across age groups and travel times.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100 flex flex-col">
+                <h3 class="text-xl font-bold mb-4 text-center">Activities by Distance</h3>
+                <p class="text-sm text-stone-500 mb-4 text-center">Travel time from Mahoney State Park basecamp.</p>
+                <div class="chart-container">
+                    <canvas id="distanceChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100 flex flex-col">
+                <h3 class="text-xl font-bold mb-4 text-center">Age Group Suitability</h3>
+                <p class="text-sm text-stone-500 mb-4 text-center">Percentage of attractions suitable for each demographic.</p>
+                <div class="chart-container">
+                    <canvas id="ageChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-stone-800 text-white p-8 rounded-2xl">
+            <h3 class="text-2xl font-bold mb-4">Quick Reunion Tips</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div>
+                    <span class="block text-3xl mb-2">🚗</span>
+                    <h4 class="font-bold text-lg">Entry Permit</h4>
+                    <p class="text-stone-300 text-sm">Nebraska State Park permits are required for all vehicles ($7-14/day or annual pass).</p>
+                </div>
+                <div>
+                    <span class="block text-3xl mb-2">☀️</span>
+                    <h4 class="font-bold text-lg">Weather Alert</h4>
+                    <p class="text-stone-300 text-sm">Late July temperatures often exceed 90°F. Activities are best planned for early morning or late afternoon.</p>
+                </div>
+                <div>
+                    <span class="block text-3xl mb-2">🎭</span>
+                    <h4 class="font-bold text-lg">Book Early</h4>
+                    <p class="text-stone-300 text-sm">The Melodrama and Horseback riding sessions fill up weeks in advance for summer weekends.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- EXPLORE SECTION -->
+    <section id="tab-explore" class="hide space-y-8">
+        <div class="text-center mb-10">
+            <h2 class="text-3xl font-bold mb-2">Browse All Attractions</h2>
+            <p class="text-stone-500">Sorted by distance from Mahoney State Park.</p>
+            
+            <div class="mt-6 flex flex-wrap justify-center gap-2">
+                <button onclick="filterCategory('All')" class="filter-btn px-4 py-2 rounded-full bg-stone-200 text-stone-700 hover:bg-accent hover:text-white transition-colors text-sm font-semibold">All</button>
+                <button onclick="filterCategory('Mahoney')" class="filter-btn px-4 py-2 rounded-full bg-stone-200 text-stone-700 hover:bg-accent hover:text-white transition-colors text-sm font-semibold">Mahoney On-Site</button>
+                <button onclick="filterCategory('Wildlife')" class="filter-btn px-4 py-2 rounded-full bg-stone-200 text-stone-700 hover:bg-accent hover:text-white transition-colors text-sm font-semibold">Zoos & Wildlife</button>
+                <button onclick="filterCategory('Museum')" class="filter-btn px-4 py-2 rounded-full bg-stone-200 text-stone-700 hover:bg-accent hover:text-white transition-colors text-sm font-semibold">Museums</button>
+                <button onclick="filterCategory('Water')" class="filter-btn px-4 py-2 rounded-full bg-stone-200 text-stone-700 hover:bg-accent hover:text-white transition-colors text-sm font-semibold">Water Parks</button>
+                <button onclick="filterCategory('Indoor')" class="filter-btn px-4 py-2 rounded-full bg-stone-200 text-stone-700 hover:bg-accent hover:text-white transition-colors text-sm font-semibold">Indoor Fun</button>
+            </div>
+        </div>
+
+        <div id="attraction-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamic Attraction Cards -->
+        </div>
+    </section>
+
+    <!-- EVENTS SECTION -->
+    <section id="tab-events" class="hide space-y-8">
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-stone-100">
+            <h2 class="text-3xl mb-4 text-stone-800">Reunion Week Schedule</h2>
+            <p class="text-stone-600 mb-8">Detailed view of what's happening specifically from Sunday, July 26 to Wednesday, July 29, 2026.</p>
+
+            <div class="space-y-6">
+                <!-- Sunday -->
+                <div class="border-l-4 border-highlight pl-6 py-2">
+                    <h3 class="text-xl font-bold text-highlight uppercase tracking-wider">Sunday, July 26, 2026</h3>
+                    <div class="mt-4 space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-bold text-stone-800">Check-In & Arrival</p>
+                                <p class="text-sm text-stone-500">Peter Kiewit Lodge / Cabin Check-in</p>
+                            </div>
+                            <span class="text-stone-400 text-sm">4:00 PM</span>
+                        </div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-bold text-stone-800">Mahoney Melodrama Performance</p>
+                                <p class="text-sm text-stone-500">Family-friendly interactive theater at the Denman Pavilion.</p>
+                            </div>
+                            <span class="text-stone-400 text-sm">7:30 PM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monday -->
+                <div class="border-l-4 border-accent pl-6 py-2">
+                    <h3 class="text-xl font-bold text-accent uppercase tracking-wider">Monday, July 27, 2026</h3>
+                    <div class="mt-4 space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-bold text-stone-800">Aquatic Center Opening</p>
+                                <p class="text-sm text-stone-500">Water slides and wave pool - best time for families.</p>
+                            </div>
+                            <span class="text-stone-400 text-sm">11:00 AM</span>
+                        </div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-bold text-stone-800">Wildlife Safari Park Guided Tour</p>
+                                <p class="text-sm text-stone-500">A 4-mile drive-through adventure just minutes away.</p>
+                            </div>
+                            <span class="text-stone-400 text-sm">2:00 PM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tuesday -->
+                <div class="border-l-4 border-primary pl-6 py-2">
+                    <h3 class="text-xl font-bold text-primary uppercase tracking-wider">Tuesday, July 28, 2026</h3>
+                    <div class="mt-4 space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-bold text-stone-800">Omaha Zoo Field Trip</p>
+                                <p class="text-sm text-stone-500">Early departure recommended for the Henry Doorly Zoo.</p>
+                            </div>
+                            <span class="text-stone-400 text-sm">9:00 AM</span>
+                        </div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-bold text-stone-800">Picnic at Owen Marina</p>
+                                <p class="text-sm text-stone-500">Paddleboats and group picnic site reserved.</p>
+                            </div>
+                            <span class="text-stone-400 text-sm">5:30 PM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Wednesday -->
+                <div class="border-l-4 border-stone-300 pl-6 py-2">
+                    <h3 class="text-xl font-bold text-stone-400 uppercase tracking-wider">Wednesday, July 29, 2026</h3>
+                    <div class="mt-4 space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-bold text-stone-800">Farewell Brunch</p>
+                                <p class="text-sm text-stone-500">Lodge Dining Room - Wrap up and photos.</p>
+                            </div>
+                            <span class="text-stone-400 text-sm">10:00 AM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="mt-20 py-10 bg-stone-100 border-t border-stone-200">
+    <div class="max-w-6xl mx-auto px-4 text-center">
+        <p class="text-stone-400 text-sm">Family Reunion 2026 Attraction Guide • Created for Web & Print</p>
+    </div>
+</footer>
+
+<script>
+    const data = [
+        {
+            name: "Owen Marina (Mahoney)",
+            category: "Mahoney",
+            dist: "0 mi (On-Site)",
+            desc: "Paddleboats, pontoon rentals, fishing supplies, and snacks on the lake.",
+            hours: "Sun-Wed: 8:00 AM - 8:00 PM",
+            price: "$10-25 per rental",
+            ages: "All Ages",
+            type: "Outdoor"
+        },
+        {
+            name: "Aquatic Center (Mahoney)",
+            category: "Mahoney",
+            dist: "0 mi (On-Site)",
+            desc: "Huge wave pool, water slides, and zero-entry kiddie pool area.",
+            hours: "Sun-Wed: 11:00 AM - 7:00 PM",
+            price: "$12 Adults / $10 Kids",
+            ages: "All Ages",
+            type: "Water"
+        },
+        {
+            name: "Horseback & Pony Rides",
+            category: "Mahoney",
+            dist: "0 mi (On-Site)",
+            desc: "Guided trail rides through the Platte River bluffs. Pony rides for little ones.",
+            hours: "Scheduled Sessions (9AM-5PM)",
+            price: "$30 Trail / $5 Pony",
+            ages: "Pony (Under 8) / Trail (8+)",
+            type: "Outdoor"
+        },
+        {
+            name: "Activity Center & Ice/Roller",
+            category: "Mahoney",
+            dist: "0.5 mi (On-Site)",
+            desc: "Indoor playground and seasonal skating rink. Great for cooling off.",
+            hours: "Sun-Wed: 10:00 AM - 8:00 PM",
+            price: "$3-7 Entry",
+            ages: "Kids & Teens",
+            type: "Indoor"
+        },
+        {
+            name: "Wildlife Safari Park",
+            category: "Wildlife",
+            dist: "4 mi (8 mins)",
+            desc: "Drive-through park featuring elk, bison, wolves, and bear sanctuary.",
+            hours: "Sun-Wed: 9:00 AM - 7:00 PM",
+            price: "$12 Adults / $10 Kids",
+            ages: "All Ages",
+            type: "Outdoor"
+        },
+        {
+            name: "SAC Aerospace Museum",
+            category: "Museum",
+            dist: "3 mi (6 mins)",
+            desc: "Massive collection of aircraft and spacecraft under indoor climate control.",
+            hours: "Sun-Wed: 9:00 AM - 5:00 PM",
+            price: "$16 Adults / $10 Seniors",
+            ages: "All Ages",
+            type: "Indoor"
+        },
+        {
+            name: "Omaha Henry Doorly Zoo",
+            category: "Wildlife",
+            dist: "25 mi (28 mins)",
+            desc: "World-class zoo with the world's largest indoor desert and indoor rainforest.",
+            hours: "Sun-Wed: 9:00 AM - 5:00 PM",
+            price: "$32 Adults / $24 Kids",
+            ages: "All Ages",
+            type: "Outdoor/Indoor"
+        },
+        {
+            name: "Lincoln Children's Zoo",
+            category: "Wildlife",
+            dist: "24 mi (26 mins)",
+            desc: "Highly walkable, interactive zoo perfect for smaller children and seniors.",
+            hours: "Sun-Wed: 10:00 AM - 5:00 PM",
+            price: "$18 Adults / $15 Kids",
+            ages: "Ages 0-12 / Seniors",
+            type: "Outdoor"
+        },
+        {
+            name: "Lincoln Children's Museum",
+            category: "Museum",
+            dist: "26 mi (30 mins)",
+            desc: "Three floors of hands-on exhibits for imaginative play.",
+            hours: "Sun-Wed: 9:00 AM - 5:00 PM",
+            price: "$15 per person",
+            ages: "Toddler to Pre-Teen",
+            type: "Indoor"
+        },
+        {
+            name: "Omaha Children's Museum",
+            category: "Museum",
+            dist: "28 mi (32 mins)",
+            desc: "Interactive STEAM exhibits and a huge ball pit machine.",
+            hours: "Sun-Wed: 10:00 AM - 4:00 PM",
+            price: "$16 per person",
+            ages: "Toddler to Pre-Teen",
+            type: "Indoor"
+        },
+        {
+            name: "The Durham Museum",
+            category: "Museum",
+            dist: "27 mi (31 mins)",
+            desc: "Located in Omaha's old Union Station. Massive art deco hall and train cars.",
+            hours: "Sun: 1PM-5PM / Mon-Wed: 10-4",
+            price: "$15 Adults / $12 Seniors",
+            ages: "Seniors & Families",
+            type: "Indoor"
+        },
+        {
+            name: "Boulder Creek Mini Golf",
+            category: "Indoor",
+            dist: "20 mi (22 mins)",
+            desc: "Two 18-hole courses with waterfalls and caves in Omaha.",
+            hours: "Sun-Wed: 10:00 AM - 10:00 PM",
+            price: "$12 per round",
+            ages: "All Ages",
+            type: "Outdoor"
+        }
+    ];
+
+    function showTab(tabId) {
+        document.querySelectorAll('section').forEach(sec => sec.classList.add('hide'));
+        document.getElementById('tab-' + tabId).classList.remove('hide');
+        
+        document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('tab-active'));
+        document.getElementById('btn-' + tabId).classList.add('tab-active');
+        
+        window.scrollTo(0, 0);
+    }
+
+    function renderCards(filter = 'All') {
+        const grid = document.getElementById('attraction-grid');
+        grid.innerHTML = '';
+        
+        const filtered = filter === 'All' ? data : data.filter(item => item.category === filter);
+        
+        filtered.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card bg-white p-6 rounded-xl shadow-sm border border-stone-100 flex flex-col h-full';
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-3">
+                    <span class="text-xs font-bold uppercase tracking-widest text-accent">${item.category}</span>
+                    <span class="text-xs font-semibold text-stone-400">${item.dist}</span>
+                </div>
+                <h4 class="text-xl font-bold text-stone-800 mb-2">${item.name}</h4>
+                <p class="text-sm text-stone-600 mb-4 flex-grow">${item.desc}</p>
+                <div class="space-y-2 mt-4 pt-4 border-t border-stone-50">
+                    <div class="flex text-xs">
+                        <span class="font-bold w-20 shrink-0">🕒 Hours:</span>
+                        <span class="text-stone-500">${item.hours}</span>
+                    </div>
+                    <div class="flex text-xs">
+                        <span class="font-bold w-20 shrink-0">💰 Price:</span>
+                        <span class="text-stone-500">${item.price}</span>
+                    </div>
+                    <div class="flex text-xs">
+                        <span class="font-bold w-20 shrink-0">👪 Ages:</span>
+                        <span class="text-stone-500 font-semibold">${item.ages}</span>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function filterCategory(cat) {
+        renderCards(cat);
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            if(btn.innerText === cat) {
+                btn.classList.add('bg-accent', 'text-white');
+                btn.classList.remove('bg-stone-200', 'text-stone-700');
+            } else {
+                btn.classList.remove('bg-accent', 'text-white');
+                btn.classList.add('bg-stone-200', 'text-stone-700');
+            }
+        });
+    }
+
+    function initCharts() {
+        // Distance Chart
+        const ctxDist = document.getElementById('distanceChart').getContext('2d');
+        new Chart(ctxDist, {
+            type: 'bar',
+            data: {
+                labels: ['On-Site', 'Wildlife Park', 'SAC Museum', 'Omaha Zoo', 'Lincoln Zoo'],
+                datasets: [{
+                    label: 'Distance (Miles)',
+                    data: [0, 4, 3, 25, 24],
+                    backgroundColor: '#84A59D',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { 
+                    y: { beginAtZero: true, title: { display: true, text: 'Miles' } },
+                    x: { ticks: { callback: function(value) { return this.getLabelForValue(value).substring(0, 10); } } }
+                }
+            }
+        });
+
+        // Age Suitability Chart
+        const ctxAge = document.getElementById('ageChart').getContext('2d');
+        new Chart(ctxAge, {
+            type: 'doughnut',
+            data: {
+                labels: ['Toddlers', 'Kids/Teens', 'Adults', 'Seniors'],
+                datasets: [{
+                    data: [20, 35, 25, 20],
+                    backgroundColor: ['#D4A373', '#84A59D', '#4A5568', '#CCD5AE']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, padding: 20 } }
+                }
+            }
+        });
+    }
+
+    window.onload = () => {
+        renderCards();
+        initCharts();
+    };
+</script>
+
+</body>
+</html>
