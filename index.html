@@ -5,15 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Family Reunion 2026: Attraction Guide</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        accent: '#15B5C4',     // turquoise
+                        highlight: '#8DC63F',  // lime
+                        primary: '#0E4D5C',    // deep teal
+                        seafoam: '#2EA9C9'     // mid blue
+                    }
+                }
+            }
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap');
 
         :root {
-            --bg-warm: #FDFBF7;
-            --primary: #4A5568;
-            --accent: #84A59D;
-            --highlight: #D4A373;
+            --bg-warm: #EFFBF9;   /* pale aqua */
+            --primary: #0E4D5C;   /* deep teal */
+            --accent: #15B5C4;    /* turquoise */
+            --highlight: #8DC63F; /* lime */
         }
 
         body {
@@ -53,7 +67,7 @@
         }
 
         .hide { display: none; }
-        
+
         .scroll-section {
             scroll-margin-top: 100px;
         }
@@ -61,26 +75,18 @@
 </head>
 <body class="antialiased">
 
-<!-- Chosen Palette: Warm Earth Tones (Cream, Sage, Slate, Sand) -->
-<!-- Application Structure Plan: 
-    1. Dashboard Landing: High-level overview, quick stats (Age distribution, distance chart), and reunion summary.
+<!-- Chosen Palette: Turquoise & Lime (Aqua, Turquoise, Lime, Deep Teal) -->
+<!-- Application Structure Plan:
+    1. Dashboard Landing: High-level overview, distance chart, and reunion summary.
     2. Interactive Category Browser: A tabbed interface allowing users to filter attractions by type (Mahoney, Zoos, Museums, etc.).
     3. Day-by-Day View: A specific view for the July 26-29 dates to show what is happening and operational hours.
-    4. Proximity Search: A simple distance-based sorting system.
-    This structure was chosen to cater to the mixed demographic of the reunion, ensuring older adults can find information quickly via clear headers while providing interactive charts for a modern exploration experience.
--->
-<!-- Visualization & Content Choices:
-    - Bar Chart (Chart.js): Comparing distances from Mahoney to various hubs to manage travel expectations.
-    - Doughnut Chart (Chart.js): Breakdown of attractions by age suitability to ensure 'something for everyone'.
-    - Interactive Cards: Each attraction is presented as a clean card with specific '2026-Ready' data.
-    - JS Filtering: Real-time category filtering to reduce information density.
-    - Confirmation: NO SVG graphics used. NO Mermaid JS used. Using standard Unicode and CSS for visual markers.
+    This structure was chosen to cater to the mixed demographic of the reunion, ensuring older adults can find information quickly via clear headers while providing an interactive chart for a modern exploration experience.
 -->
 
 <header class="bg-white border-b border-stone-200 sticky top-0 z-50">
     <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
         <div class="text-center md:text-left mb-4 md:mb-0">
-            <h1 class="text-3xl font-bold text-stone-800">Family Reunion 2026</h1>
+            <h1 class="text-3xl font-bold text-primary">Family Reunion 2026</h1>
             <p class="text-stone-500 font-medium italic">July 26 – July 29 • Mahoney State Park, NE</p>
         </div>
         <nav class="flex space-x-2 md:space-x-6 overflow-x-auto pb-2 md:pb-0">
@@ -95,46 +101,39 @@
     <!-- DASHBOARD SECTION -->
     <section id="tab-dashboard" class="space-y-12">
         <div class="bg-white p-8 rounded-2xl shadow-sm border border-stone-100">
-            <h2 class="text-4xl mb-4 text-stone-800">Welcome to the Kosmicki Fam Jam 2026!</h2>
+            <h2 class="text-4xl mb-4 text-primary">Welcome to the Kosmicki Fam Jam 2026!</h2>
             <p class="text-lg text-stone-600 max-w-3xl">
-                Our reunion is centered at **Eugene T. Mahoney State Park**, perfectly situated halfway between Lincoln and Omaha. This interactive guide helps you navigate on-site amenities and regional favorites. Use the charts below to see how our activities spread across age groups and travel times.
+                Our reunion is centered at <strong>Eugene T. Mahoney State Park</strong>, perfectly situated halfway between Lincoln and Omaha. This interactive guide helps you navigate on-site amenities and regional favorites. Use the chart below to see how our activities spread across travel times.
             </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100 flex flex-col">
-                <h3 class="text-xl font-bold mb-4 text-center">Activities by Distance</h3>
+        <div class="grid grid-cols-1 gap-8">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100 flex flex-col max-w-2xl mx-auto w-full">
+                <h3 class="text-xl font-bold mb-4 text-center text-primary">Activities by Distance</h3>
                 <p class="text-sm text-stone-500 mb-4 text-center">Travel time from Mahoney State Park basecamp.</p>
                 <div class="chart-container">
                     <canvas id="distanceChart"></canvas>
                 </div>
             </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100 flex flex-col">
-                <h3 class="text-xl font-bold mb-4 text-center">Age Group Suitability</h3>
-                <p class="text-sm text-stone-500 mb-4 text-center">Percentage of attractions suitable for each demographic.</p>
-                <div class="chart-container">
-                    <canvas id="ageChart"></canvas>
-                </div>
-            </div>
         </div>
-        
-        <div class="bg-stone-800 text-white p-8 rounded-2xl">
+
+        <div class="text-white p-8 rounded-2xl" style="background-color: #0E4D5C;">
             <h3 class="text-2xl font-bold mb-4">Quick Reunion Tips</h3>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div>
                     <span class="block text-3xl mb-2">🚗</span>
-                    <h4 class="font-bold text-lg">Entry Permit</h4>
-                    <p class="text-stone-300 text-sm">Nebraska State Park permits are required for all vehicles ($7-14/day or annual pass).</p>
+                    <h4 class="font-bold text-lg" style="color:#8DC63F;">Entry Permit</h4>
+                    <p class="text-stone-200 text-sm">Nebraska State Park permits are required for all vehicles ($7-14/day or annual pass).</p>
                 </div>
                 <div>
                     <span class="block text-3xl mb-2">☀️</span>
-                    <h4 class="font-bold text-lg">Weather Alert</h4>
-                    <p class="text-stone-300 text-sm">Late July temperatures often exceed 90°F. Activities are best planned for early morning or late afternoon.</p>
+                    <h4 class="font-bold text-lg" style="color:#8DC63F;">Weather Alert</h4>
+                    <p class="text-stone-200 text-sm">Late July temperatures often exceed 90°F. Activities are best planned for early morning or late afternoon.</p>
                 </div>
                 <div>
                     <span class="block text-3xl mb-2">🎭</span>
-                    <h4 class="font-bold text-lg">Book Early</h4>
-                    <p class="text-stone-300 text-sm">The Melodrama and Horseback riding sessions fill up weeks in advance for summer weekends.</p>
+                    <h4 class="font-bold text-lg" style="color:#8DC63F;">Book Early</h4>
+                    <p class="text-stone-200 text-sm">The Melodrama and Horseback riding sessions fill up weeks in advance for summer weekends.</p>
                 </div>
             </div>
         </div>
@@ -143,9 +142,9 @@
     <!-- EXPLORE SECTION -->
     <section id="tab-explore" class="hide space-y-8">
         <div class="text-center mb-10">
-            <h2 class="text-3xl font-bold mb-2">Browse All Attractions</h2>
+            <h2 class="text-3xl font-bold mb-2 text-primary">Browse All Attractions</h2>
             <p class="text-stone-500">Sorted by distance from Mahoney State Park.</p>
-            
+
             <div class="mt-6 flex flex-wrap justify-center gap-2">
                 <button onclick="filterCategory('All')" class="filter-btn px-4 py-2 rounded-full bg-stone-200 text-stone-700 hover:bg-accent hover:text-white transition-colors text-sm font-semibold">All</button>
                 <button onclick="filterCategory('Mahoney')" class="filter-btn px-4 py-2 rounded-full bg-stone-200 text-stone-700 hover:bg-accent hover:text-white transition-colors text-sm font-semibold">Mahoney On-Site</button>
@@ -164,7 +163,7 @@
     <!-- EVENTS SECTION -->
     <section id="tab-events" class="hide space-y-8">
         <div class="bg-white p-8 rounded-2xl shadow-sm border border-stone-100">
-            <h2 class="text-3xl mb-4 text-stone-800">Reunion Week Schedule</h2>
+            <h2 class="text-3xl mb-4 text-primary">Reunion Week Schedule</h2>
             <p class="text-stone-600 mb-8">Detailed view of what's happening specifically from Sunday, July 26 to Wednesday, July 29, 2026.</p>
 
             <div class="space-y-6">
@@ -211,8 +210,8 @@
                 </div>
 
                 <!-- Tuesday -->
-                <div class="border-l-4 border-primary pl-6 py-2">
-                    <h3 class="text-xl font-bold text-primary uppercase tracking-wider">Tuesday, July 28, 2026</h3>
+                <div class="border-l-4 border-seafoam pl-6 py-2">
+                    <h3 class="text-xl font-bold text-seafoam uppercase tracking-wider">Tuesday, July 28, 2026</h3>
                     <div class="mt-4 space-y-4">
                         <div class="flex justify-between items-start">
                             <div>
@@ -383,19 +382,19 @@
     function showTab(tabId) {
         document.querySelectorAll('section').forEach(sec => sec.classList.add('hide'));
         document.getElementById('tab-' + tabId).classList.remove('hide');
-        
+
         document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('tab-active'));
         document.getElementById('btn-' + tabId).classList.add('tab-active');
-        
+
         window.scrollTo(0, 0);
     }
 
     function renderCards(filter = 'All') {
         const grid = document.getElementById('attraction-grid');
         grid.innerHTML = '';
-        
+
         const filtered = filter === 'All' ? data : data.filter(item => item.category === filter);
-        
+
         filtered.forEach(item => {
             const card = document.createElement('div');
             card.className = 'card bg-white p-6 rounded-xl shadow-sm border border-stone-100 flex flex-col h-full';
@@ -404,7 +403,7 @@
                     <span class="text-xs font-bold uppercase tracking-widest text-accent">${item.category}</span>
                     <span class="text-xs font-semibold text-stone-400">${item.dist}</span>
                 </div>
-                <h4 class="text-xl font-bold text-stone-800 mb-2">${item.name}</h4>
+                <h4 class="text-xl font-bold text-primary mb-2">${item.name}</h4>
                 <p class="text-sm text-stone-600 mb-4 flex-grow">${item.desc}</p>
                 <div class="space-y-2 mt-4 pt-4 border-t border-stone-50">
                     <div class="flex text-xs">
@@ -448,7 +447,7 @@
                 datasets: [{
                     label: 'Distance (Miles)',
                     data: [0, 4, 3, 25, 24],
-                    backgroundColor: '#84A59D',
+                    backgroundColor: '#15B5C4',
                     borderRadius: 6
                 }]
             },
@@ -456,29 +455,9 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
-                scales: { 
+                scales: {
                     y: { beginAtZero: true, title: { display: true, text: 'Miles' } },
                     x: { ticks: { callback: function(value) { return this.getLabelForValue(value).substring(0, 10); } } }
-                }
-            }
-        });
-
-        // Age Suitability Chart
-        const ctxAge = document.getElementById('ageChart').getContext('2d');
-        new Chart(ctxAge, {
-            type: 'doughnut',
-            data: {
-                labels: ['Toddlers', 'Kids/Teens', 'Adults', 'Seniors'],
-                datasets: [{
-                    data: [20, 35, 25, 20],
-                    backgroundColor: ['#D4A373', '#84A59D', '#4A5568', '#CCD5AE']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { boxWidth: 12, padding: 20 } }
                 }
             }
         });
